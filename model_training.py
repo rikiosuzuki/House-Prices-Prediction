@@ -24,19 +24,15 @@ class HousePriceModel:
         results = {}
         
         for name, model in self.models.items():
-            # Train model
             model.fit(X_train, y_train)
             
-            # Make predictions
             train_pred = model.predict(X_train)
             test_pred = model.predict(X_test)
             
-            # Calculate metrics
             train_rmse = np.sqrt(mean_squared_error(y_train, train_pred))
             test_rmse = np.sqrt(mean_squared_error(y_test, test_pred))
             r2 = r2_score(y_test, test_pred)
             
-            # Perform cross-validation
             cv_scores = cross_val_score(model, X_train, y_train, 
                                       cv=5, scoring='neg_mean_squared_error')
             cv_rmse = np.sqrt(-cv_scores.mean())
@@ -48,7 +44,6 @@ class HousePriceModel:
                 'cv_rmse': cv_rmse
             }
             
-            # Update best model
             if r2 > self.best_score:
                 self.best_model = model
                 self.best_score = r2
@@ -62,14 +57,12 @@ class HousePriceModel:
         model = self.models[model_name]
         importance = model.feature_importances_
         
-        # Create feature importance DataFrame
         feat_importance = pd.DataFrame({
             'feature': X.columns,
             'importance': importance
         })
         feat_importance = feat_importance.sort_values('importance', ascending=False)
         
-        # Plot
         plt.figure(figsize=(10, 6))
         sns.barplot(x='importance', y='feature', data=feat_importance)
         plt.title(f'Feature Importance ({model_name})')
@@ -82,7 +75,6 @@ class HousePriceModel:
         predictions = {}
         for name, model in self.models.items():
             y_pred = model.predict(X_test)
-            # Create DataFrame with actual and predicted prices
             pred_df = pd.DataFrame({
                 'Actual_Price': y_test,
                 'Predicted_Price': y_pred,
